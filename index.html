@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Better Batch</title>
+    <link
+        rel="stylesheet"
+        type="text/css"
+        href="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.18.0/maps/maps.css"
+    />
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/main.js"></script>
+    <script src="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.18.0/maps/maps-web.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/read-excel-file@5.x/bundle/read-excel-file.min.js"></script>
+</head>
+<body>
+
+    <div id="map">
+        <script>
+
+            var i = 1
+            var map = tt.map({
+                key: "Xt9nHjAzfJLpY1CFEFJAmoxtFlBE9gAe",
+                center: [-82.4076, 27.7731],
+                container: "map",
+                stylesVisibility: {
+                trafficIncidents: true,
+                trafficFlow: true
+                },
+                zoom: 9,
+            })
+
+
+            const addMarker = (longitude, latitude, color) => {
+                let storeName = document.getElementById("store-name").value
+                console.log(name)
+                let newPopupColor = `'popup-color${i}'`
+                let changedColor = `'marker${i}'`
+
+                let popupDiv = document.createElement('div')
+                popupDiv.innerHTML = `${storeName}<br><input type="color" id="popup-color${i}" name="popup-color" onchange="changePopup(${newPopupColor},${changedColor})"><br>`                             
+                popupDiv.style.textAlign = "center"
+
+                let popup = new tt.Popup({
+                    closeButton: false,
+                    offset: 22,
+                    anchor: "bottom"
+                }).setDOMContent(popupDiv)
+
+
+                const element = document.createElement("div")
+                element.className = `marker${i}`
+                const marker = new tt.Marker({
+                draggable: true,
+                element: element,
+                }).setLngLat([longitude, latitude]).setPopup(popup).addTo(map)
+
+                console.log(color)
+                let setColor = document.querySelector(`.marker${i}`)
+                setColor.style.backgroundColor = color
+                setColor.style.backgroundSize = "cover"
+                setColor.style.height = "22px"
+                setColor.style.width = "22px"
+                setColor.style.borderRadius = "11px"
+                setColor.style.border = "solid 3px darkslategray"
+                console.log(setColor)
+                i++   
+            }   
+            
+            
+            const addExcelMarkers = (longitude, latitude, color, name) => {
+                console.log(name)
+                let newPopupColor = `'popup-color${i}'`
+                let changedColor = `'marker${i}'`
+
+                let popupDiv = document.createElement('div')
+                popupDiv.innerHTML = `${name}<br><input type="color" id="popup-color${i}" name="popup-color" onchange="changePopup(${newPopupColor},${changedColor})"><br>`                             
+                popupDiv.style.textAlign = "center"
+
+                let popup = new tt.Popup({
+                    closeButton: false,
+                    offset: 22,
+                    anchor: "bottom"
+                }).setDOMContent(popupDiv)
+
+
+                const element = document.createElement("div")
+                element.className = `marker${i}`
+                const marker = new tt.Marker({
+                draggable: true,
+                element: element,
+                }).setLngLat([longitude, latitude]).setPopup(popup).addTo(map)
+
+                console.log(color)
+                let setColor = document.querySelector(`.marker${i}`)
+                setColor.style.backgroundColor = color
+                setColor.style.backgroundSize = "cover"
+                setColor.style.height = "22px"
+                setColor.style.width = "22px"
+                setColor.style.borderRadius = "11px"
+                setColor.style.border = "solid 3px darkslategray"
+                console.log(setColor)
+                i++   
+            } 
+
+            
+            const changePopup = (classColor, newBackColor) => {
+                let newColor = document.getElementById(classColor)
+                let finalColor = newColor.value
+                console.log(newColor.value)
+                console.log(newBackColor)
+                let bgColor = document.querySelector(`.${newBackColor}`)
+                console.log(bgColor)
+                bgColor.style.backgroundColor = newColor.value
+            } 
+        
+        </script>
+    </div>
+    
+    <div id="search">
+
+        <h1>What store would you like to input?</h1>
+        <form id="form-id">
+            <input type="text" id="store-name" name="store-name" placeholder="Enter Store Name"><br>
+            <input type="text" id="address-entry" name="address-entry" placeholder="Enter an Address"><br>
+            <label>Pick Your Marker's Color</label><br>
+            <input type="color" id="color-picker" name="color-picker"><br>
+            <button type="submit" id="submit-button">Submit</button>
+        </form>
+
+
+        <div>
+            <h1>Drag and Drop an Excel File</h1>
+            <input type="file" name="file-input" id="file-input" accept=".xlsx" required>
+            <div id="insert-excel-table"></div>
+        </div>
+        <script>
+            const input = document.getElementById("file-input")
+            const table = document.getElementById("insert-excel-table")
+
+            input.addEventListener('change', (event) => {
+                const file = event.target.files[0]
+                readXlsxFile(file).then((rows) => {
+                    console.log(rows)
+                    let lenRows = rows.length
+                    console.log(lenRows)
+                    // let dividedRows = Math.floor(lenRows/4)
+                    // console.log(dividedRows)
+                    // setTimeout(getCoordinates, 1000)
+                    // for (let store of rows) {
+                    //     console.log(store[0])
+                    //     console.log(store[1])
+                    //     console.log(store[2])
+                    //     console.log(store[3])
+                    //     console.log(store[4])
+                    //     getCoordinates(`${store[1]}, ${store[2]}, ${store[3]} ${store[4]}`, "rgb(120, 120, 120)", store[0])
+                    // }
+                    // for (let i = 0; i < rows.length; i++) {
+                    //     console.log(rows[i])
+                    //     if (i === 0) {
+                    //         continue
+                    //     }
+                    //     else if (i === 4) {
+                    //         setTimeout(() => {getCoordinates(`${row[i][1]}, ${store[i][2]}, ${store[i][3]} ${store[i][4]}`, "rgb(120, 120, 120)", store[i][0])}, 1000)
+                    //         console.log(rows[i])
+                            // getCoordinates(`${row[i][1]}, ${store[i][2]}, ${store[i][3]} ${store[i][4]}`, "rgb(120, 120, 120)", store[i][0])
+                        // } 
+                        // else {
+                        //     console.log(rows[i])
+                        //     getCoordinates(`${row[i][1]}, ${store[i][2]}, ${store[i][3]} ${store[i][4]}`, "rgb(120, 120, 120)", store[i][0])
+                        // }
+                    // }
+
+                    // async wrapped in setTimeout
+
+                    const batchData = async (batchArr) => {
+                        for (let store of batchArr) {
+                            console.log(batchArr)
+                            setTimeout(() => {getCoordinates(`${store[1]}, ${store[2]}, ${store[3]} ${store[4]}`, "rgb(120, 120, 120)", store[0])}, 1000)
+                        }
+                    }
+
+                    let temp = []
+                    let i = 0
+                    while (true) {
+                        console.log(rows.length)
+                        if (rows.length === 0) {
+                            if (temp) {
+                                // console.log(temp)
+                                batchData(temp)
+                            }
+                            break
+                        } else {
+                            let removed = rows.pop()
+                            temp.push(removed)
+                        } 
+                        if (temp.length === 4) {
+                            // console.log(temp)
+                            batchData(temp)
+                            temp = []
+                        }
+                            // else if (i !== 3) {
+                        //     let removed = rows.pop()
+                        //     temp.push(removed)
+                        //     i++
+                        // }
+                    }
+                })
+            })
+        </script>
+
+
+        <script>
+            const getCoordinates = async (address, color, name='') => {
+                let response = await axios.get(`https://api.tomtom.com/search/2/geocode/${address.replace("/\s/g, ''")}.json?key=Xt9nHjAzfJLpY1CFEFJAmoxtFlBE9gAe`)
+                let longitude = response.data["results"][0]["position"]["lon"]
+                let latitude = response.data["results"][0]["position"]["lat"] 
+                console.log(color)
+                if (name === '') {
+                    addMarker(longitude, latitude, color)
+                } else {
+                    addExcelMarkers(longitude, latitude, color, name)
+                }
+            }
+            
+
+            let formSelector = document.getElementById("form-id");
+            formSelector.addEventListener("submit", addAddress)
+            console.log(document.querySelector("#address-entry"))
+            console.log(document.getElementById("color-picker"))
+
+            function addAddress(e) {
+                e.preventDefault()
+                let address = document.getElementById("address-entry").value
+                let markColor = document.getElementById("color-picker").value
+                console.log(markColor)
+                getCoordinates(address, markColor)
+            }
+        </script>
+    
+    </div>
+
+</body>
+</html>
